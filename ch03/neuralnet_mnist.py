@@ -1,6 +1,12 @@
 # coding: utf-8
 import sys, os
-sys.path.append(os.pardir)  # 부모 디렉터리의 파일을 가져올 수 있도록 설정
+#sys.path.append(os.pardir)
+sys.path.append(".")  # CursorAI는 각 ch0x에서 수행해도 현재 디렉토리는 "Open한" Root디렉토리로 지정됨
+                    # PyCharm은 각 ch0x에서 수행하면 그 .py 파일의 디렉토리가 현재 디렉토리로 지정됨 
+sys.path.append("./ch03")                  
+current_dir = os.getcwd()  # get current working directory
+print("========="+current_dir)
+#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # 현재 파일의 부모의 부모 디렉터리를 추가
 import numpy as np
 import pickle
 from dataset.mnist import load_mnist
@@ -13,11 +19,18 @@ def get_data():
 
 
 def init_network():
-    with open("sample_weight.pkl", 'rb') as f:
-        network = pickle.load(f)
-    return network
+    try:
+        file_path = os.path.join(os.path.dirname(__file__), "sample_weight.pkl")
+        with open(file_path, 'rb') as f:
+            network = pickle.load(f)
+        return network
+    except FileNotFoundError:
+        print("Error: sample_weight.pkl 파일을 찾을 수 없습니다.")
+        print("파일을 다음 경로에 다운로드 해주세요:", os.path.dirname(__file__))
+        sys.exit(1)
 
-
+current_dir = os.getcwd()  # get current working directory
+print("========="+current_dir)
 def predict(network, x):
     W1, W2, W3 = network['W1'], network['W2'], network['W3']
     b1, b2, b3 = network['b1'], network['b2'], network['b3']
